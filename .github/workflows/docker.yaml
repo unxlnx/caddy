@@ -68,7 +68,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.CADDY_VERSION }}
-          name: "Caddy Custom ${{ env.CADDY_VERSION }}"
+          name: "Caddy ${{ env.CADDY_VERSION }}"
           body: "Automatically generated release for Caddy version ${{ env.CADDY_VERSION }}."
           draft: false
           prerelease: false
