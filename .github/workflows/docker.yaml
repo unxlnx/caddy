@@ -45,3 +45,30 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/caddy:latest
             ghcr.io/${{ github.repository_owner }}/caddy:${{ env.CADDY_VERSION }}
           platforms: linux/amd64,linux/arm64
+
+      - name: Scan Docker Image and Generate SARIF Report
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ghcr.io/${{ github.repository_owner }}/caddy:latest'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: 0  # Do NOT fail the build
+
+      - name: Upload SARIF Report to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Create Git Tag
+        run: |
+          git tag $CADDY_VERSION
+          git push origin $CADDY_VERSION
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.CADDY_VERSION }}
+          name: "Caddy ${{ env.CADDY_VERSION }}"
+          body: "Automatically generated release for Caddy version ${{ env.CADDY_VERSION }}."
+          draft: false
+          prerelease: false
